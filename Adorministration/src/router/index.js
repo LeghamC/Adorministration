@@ -1,36 +1,62 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import DormHomeSP from '@/components/DormHomeSP.vue'
-import DormInterventionDetail from '@/components/DormInterventionDetail.vue'
-import DormInterventionForm from '@/components/DormInterventionForm.vue'
+import { createRouter, createWebHistory } from "vue-router";
+
+import Login from "../components/Login.vue";
+import StudentHome from "../components/StudentHome.vue";
+import AdminHome from "../components/AdminHome.vue";
+import SPHome from "../components/SPHome.vue";
+import ReceptionistHome from "../components/ReceptionistHome.vue";
 
 const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: DormHomeSP
+    path: "/",
+    redirect: "/login"
   },
   {
-    path: '/create',
-    name: 'CreateIntervention',
-    component: DormInterventionForm
+    path: "/login",
+    component: Login
   },
   {
-    path: '/post/:id',
-    name: 'InterventionDetail',
-    component: DormInterventionDetail,
-    props: true
+    path: "/student",
+    component: StudentHome,
+    meta: { role: "student" }
   },
   {
-    path: '/edit/:id',
-    name: 'EditIntervention',
-    component: DormInterventionForm,
-    props: true
+    path: "/admin",
+    component: AdminHome,
+    meta: { role: "admin" }
+  },
+  {
+    path: "/service",
+    component: SPHome,
+    meta: { role: "service" }
+  },
+  {
+    path: "/receptionist",
+    component: ReceptionistHome,
+    meta: { role: "ReceptionistHome" }
   }
-]
+];
 
 const router = createRouter({
   history: createWebHistory(),
   routes
-})
+});
 
-export default router
+
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+
+  if (to.path !== "/login" && !token) {
+    return next("/login");
+  }
+
+  if (to.meta.role && to.meta.role !== role) {
+    return next("/login");
+  }
+
+  next();
+});
+
+export default router;
